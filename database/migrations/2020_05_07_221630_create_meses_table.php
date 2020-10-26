@@ -18,8 +18,11 @@ class CreateMesesTable extends Migration
             $table->string('mes');
             
             $table->foreignId('gestion_id');
-            $table->foreign('gestion_id')->references('id')->on('gestiones');
-
+            $table->foreign('gestion_id')->references('id')->on('gestiones')->onDelete('cascade');
+            $table->foreignId('estado_compras');
+            $table->foreign('estado_compras')->references('id')->on('estados')->onDelete('cascade');
+            $table->foreignId('estado_ventas');
+            $table->foreign('estado_ventas')->references('id')->on('estados')->onDelete('cascade');
             $table->timestamps();
         });
     }

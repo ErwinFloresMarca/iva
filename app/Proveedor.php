@@ -12,4 +12,10 @@ class Proveedor extends Model
     {
         return $this->hasMany(Compra::class);
     }
+    public function user(){
+        return $this->hasMany(User::class);
+    }
+    public function autorizaciones(){
+        return $this->hasMany(Autorizacion::class);
+    }
 }

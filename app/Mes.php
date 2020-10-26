@@ -16,4 +16,16 @@ class Mes extends Model
     {
         return $this->HasMany(Compra::class);
     }
+    public function ventas()
+    {
+        return $this->HasMany(Venta::class);
+    }
+    public function estadoCompras()
+    {
+        return $this->belongsTo(Estado::class,'estado_compras');
+    }
+    public function estadoVentas()
+    {
+        return $this->belongsTo(Estado::class,'estado_ventas');
+    }
 }

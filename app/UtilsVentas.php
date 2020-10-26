@@ -4,29 +4,23 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Utils extends Model
+class UtilsVentas extends Model
 {
-    public static function getTamColum()
-    {
-        //       esp    no    fecha   nit    razon   fac    dui    aut   itcom  fiscal   sub   desc   base  cred    cod    tipo
-        return ["30px","30px","50px","60px","281px","65px","50px","80px","70px","60px","50px","75px","60px","50px","65px","40px"];
-    }
-    public static function getTamColumCarta()
-    {
-        //       esp    no    fecha   nit    razon   fac    dui    aut   itcom  fiscal   sub   desc   base  cred    cod    tipo
-        return ["25px","20px","45px","55px","200px","55px","40px","70px","55px","50px","45px","65px","50px","40px","65px","40px"];
+    public static function getTamColumCarta(){
+        //       espe    no.  fecha  no_fac  Auth   estado  nit    nom    impT  TASAS   Exen   cero  subT   Desc    base   deb    cod
+        return ["25px","20px","45px","35px","60px","35px","60px","140px","45px","40px","45px","45px","50px","40px","60px","45px","40px"];
     }
     public static function sumPx($arr){
         $sum=0;
         foreach($arr as $pos)
-            $sum+=str_replace("px","",Utils::getTamColumCarta()[$pos]);
+            $sum+=str_replace("px","",UtilsVentas::getTamColumCarta()[$pos]);
         return $sum;
     }
     public static function formatDate($date){
         $atrib=explode('-',$date);
         return $atrib[2]."/".$atrib[1]."/".$atrib[0];
     }
-    public static function getWhitTwooDecimals($number){
+    public static function getWithTwooDecimals($number){
 
         $number=round($number, 2);
 
@@ -52,7 +46,7 @@ class Utils extends Model
 
     public static function getStyle($pix){
 
-        return "style=\"border: back 1 solid\" width=\"".$pix."\"";
+        return "style='border: back 1 solid' width='".$pix."'";
 
     }
     public static function sumAllPx($vecPx){
@@ -61,5 +55,4 @@ class Utils extends Model
             $sum+=str_replace('px','',$px);
         return $sum;
     }
-
 }

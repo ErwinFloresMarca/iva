@@ -41,7 +41,7 @@
                   <div class="form-group">
                     <label for="nro_autorizacion">Numero de Autorización</label>
                     <div class="col">
-                        <input id="nro_autorizacion" type="number" class="form-control @error('nro_autorizacion') is-invalid @enderror" name="nro_autorizacion" value="{{ old('nro_autorizacion') }}" required autocomplete="nro_autorizacion" >
+                        <input id="nro_autorizacion" type="number" class="form-control @error('nro_autorizacion') is-invalid @enderror" name="nro_autorizacion" value="{{ old('nro_autorizacion') }}" autocomplete="nro_autorizacion" >
                         @error('nro_autorizacion')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>

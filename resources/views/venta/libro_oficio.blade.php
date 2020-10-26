@@ -1,7 +1,7 @@
 <center>
 @php 
                 use App\Utils;
-                $tamColum=Utils::getTamColumCarta();
+                $tamColum=Utils::getTamColum();
                 $ip=0;
            @endphp
             <div width="{{Utils::sumAllPx($tamColum)}}'px'">
@@ -87,7 +87,7 @@
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}>{{$compra->proveedor->razon_social}}</td>
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}>{{$compra->nro_factura}}</td>
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}>{{'   '}}</td>
-                    <td {!!Utils::getStyle($tamColum[$ip++])!!}>{{App\Autorizacion::obtenerNroAutorizacion($compra->proveedor->id,$mes->gestion->id)->nro_autorizacion}}</td>
+                    <td {!!Utils::getStyle($tamColum[$ip++])!!}>{{$compra->proveedor->nro_autorizacion}}</td>
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}>{{$compra->importe}}</td>
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}>{{$compra->importe*0.3}}</td>
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}>{{$compra->importe-($compra->importe*0.3)}}</td>

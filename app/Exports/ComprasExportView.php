@@ -4,9 +4,8 @@ namespace App\Exports;
 
 use App\Mes;
 use Illuminate\Contracts\View\View;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
-
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class ComprasExportView implements FromView
 {
     public $mes_id=0;
@@ -15,6 +14,6 @@ class ComprasExportView implements FromView
     }
     public function view():View
     {
-        return view('compra.libro_oficio',['mes'=>Mes::find($this->mes_id)]);
+        return view('compra.libro_carta_excel')->with('mes',Mes::find($this->mes_id));
     }
 }

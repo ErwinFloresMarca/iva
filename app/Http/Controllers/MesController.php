@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Estado;
 use App\Mes;
 use App\Gestion;
 use Brian2694\Toastr\Facades\Toastr;
@@ -57,6 +58,12 @@ class MesController extends Controller
         $nuevoMes=new Mes();
         $nuevoMes->gestion_id=$request->gestion_id;
         $nuevoMes->mes=$request->mes;
+        $estadoCompras=new Estado();
+        $estadoCompras->save();
+        $estadoVentas=new Estado();
+        $estadoVentas->save();
+        $nuevoMes->estado_compras=$estadoCompras->id;
+        $nuevoMes->estado_ventas=$estadoVentas->id;
         $nuevoMes->save();
         return redirect(route('mes.gestion',$request->gestion_id));
     }

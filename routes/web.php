@@ -31,6 +31,8 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::resource('/proveedor','ProveedorController');
 
+Route::resource('/cliente','ClienteController');
+
 Route::resource('/gestion','GestionController');
 
 Route::get('/mes/gestion/{gestion}','MesController@index_por_gestion')->name('mes.gestion');
@@ -48,4 +50,13 @@ Route::get('/compra/excel/{mes}','CompraController@generarExcel')->name('compra.
 Route::delete('/compra/destroy/{mes}','CompraController@destroyAll')->name('compra.destroyAll');
 
 Route::resource('/compra','CompraController');
+
+Route::get('/venta/mes/{mes}','VentaController@lista_por_mes')->name('venta.mes');
+Route::get('/venta/mes/create/{mes}','VentaController@createventa')->name('venta.create.mes');
+Route::get('/venta/pdf_carta/{mes}','VentaController@generarPDFcarta')->name('venta.pdf.carta');
+Route::get('/venta/pdf_oficio/{mes}','VentaController@generarPDFoficio')->name('venta.pdf.oficio');
+Route::get('/venta/excel/{mes}','VentaController@generarExcel')->name('venta.excel');
+Route::delete('/venta/destroy/{mes}','VentaController@destroyAll')->name('venta.destroyAll');
+
+Route::resource('/venta','VentaController');
 

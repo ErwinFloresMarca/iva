@@ -33,6 +33,21 @@
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('plugins/toastr.min.css')}}">
+    <!-- Axios -->
+    <script src="{{asset('axios/axios.js')}}"></script>
+    <!-- Vue desarrollo -->
+    <script src="{{asset('vue/vue.js')}}"></script>
+
+    <!-- configurar axios -->
+    <script>
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = '{{ csrf_token() }}';
+    </script>
+
+    <!-- Element ui -->
+    <!-- import CSS -->
+    <link rel="stylesheet" href="{{asset('elementUi/elementUi.css')}}">
+    <!-- import JavaScript -->
+    <script src="{{asset('elementUi/elementUi.js')}}"></script>
 </head>
 <body 
 @switch(Request::path())

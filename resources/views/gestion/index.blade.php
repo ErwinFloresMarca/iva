@@ -23,7 +23,7 @@ background='{{asset("img/archivo.jpg")}}' style='background-size: cover;'
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ($gestiones as $gestion)
+                @foreach ($gestiones->sortByDesc('gestion') as $gestion)
                 <tr>
                     <td>
                         <a href="{{route('mes.gestion',$gestion)}}" class="btn btn-lg btn-light">

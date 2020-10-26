@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class='row justify-content-center'>
+<div class='row justify-content-center' id="app">
 <div class="col-sm-6">
         <div class="card card-success" style="background: rgb(255, 255, 255,0.3)">
               <div class="card-header">
@@ -35,11 +35,16 @@
         <div class="form-group">
                     <label for="mes">Proveedor</label>
                     <div class="col">
-                        <select id="proveedor_id" class="form-control @error('proveedor_id') is-invalid @enderror" name="proveedor_id" value="{{ old('proveedor_id')?old('proveedor_id'):'' }}" >
-                           @foreach($proveedores as $proveedor)
-                           <option id="option{{$proveedor->id}}" value="{{$proveedor->id}}">{{$proveedor->NIT}} - {{$proveedor->razon_social}}</option>
-                           @endforeach
-                        </select>
+                      <input v-bind:value='proveedor_id' type="hidden" name="proveedor_id">
+                        <el-select v-model="proveedor_id" filterable placeholder="Seleccione Proveedor">
+                          <el-option
+                            v-for="item in proveedores"
+                            :key="'prov-'+item.id"
+                            :label="item.NIT+' - '+item.razon_social"
+                            :value="item.id">
+                          </el-option>
+                        </el-select>
+                      
                         @error('proveedor_id')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -127,6 +132,12 @@
                       <label for="">Razon Social: </label> <label id="labelMostrarRazonSocial"></label>
                   </div>
                   </font>
+                  <template v-if="!tieneNroAutorizacion&&(proveedor_id)">
+                  <div class="alert alert-danger" role="alert">
+                    Este proveedor no cuenta con un numero de autorizacion para esta Gestion!!!
+                  </div>
+                    <a @click="registrar(prov.id)" class="btn btn-danger" style="color: white">Registar Nro de Autorización</a>
+                  </template>
                     <div class="form-group">
                       <label for="especificacion">Especificación</label>
                       <div class="col">
@@ -185,7 +196,7 @@
                       <label for="razon_social">Codigo de Control</label>
                       
                       <div class="col">
-                          <input id="cod_control" type="text" class="form-control @error('cod_control') is-invalid @enderror" name="cod_control" value="{{ old('cod_control') }}" required  >
+                          <input id="cod_control" type="text" class="form-control @error('cod_control') is-invalid @enderror" name="cod_control" value="{{ old('cod_control') }}" >
                           @error('cod_control')
                               <span class="invalid-feedback" role="alert">
                                   <strong>{{ $message }}</strong>
@@ -220,9 +231,85 @@
                 </div>
              
             </div>
+            <div :class="{modal: true, fade: true, show: showForm }" :style="'display: '+((showForm)? 'block': 'none') " id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" :aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Nueva Autorizacion</h5>
+                      <button @click="showForm=false" type="button" class="close" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <form>
+                      <div class="form-group">
+                          <label for="exampleInputEmail1">Numero de Autorizacion</label>
+                          <input type="number" v-model="nuevaAutorizacion.nro_autorizacion" class="form-control" placeholder="introduzca numero de autorizacion">
+                      </div>
+                      </form>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" @click="showForm=false">Close</button>
+                      <button type="button" class="btn btn-primary" @click="enviar">Guardar Cambios</button>
+                  </div>
+                  </div>
+              </div>
+            </div>
 </div>
 </div>
-
+<script>
+    new Vue({
+        el: '#app',
+        data () {
+            return {
+                gestion: {!! json_encode($mes->gestion) !!},
+                nuevaAutorizacion:{},
+                showForm: false,
+                autorizaciones:[],
+                proveedores: {!!json_encode(App\Proveedor::with('autorizaciones')->get())!!},
+                proveedor_id: {{ old('proveedor_id')?old('proveedor_id'): 'null' }},
+                prov: {},
+                tieneNroAutorizacion: false,
+            }
+        },
+        watch: {
+          proveedor_id: function(newVal,oldVal){
+            this.tieneNroAutorizacion=false;
+            const app=this;
+            this.prov=this.proveedores.filter((proveedor) => { return (proveedor.id === parseInt(newVal)) })[0];
+            if((this.prov.autorizaciones.filter((auth) => { return (auth.gestion_id === app.gestion.id) })).length>0){
+              this.tieneNroAutorizacion=true;
+            }
+          },
+        },
+        computed: {},
+        methods: {
+            registrar(proveedor_id){
+                this.showForm=true;
+                this.nuevaAutorizacion={};
+                this.nuevaAutorizacion.proveedor_id=proveedor_id;
+                this.nuevaAutorizacion.gestion_id=this.gestion.id;
+                console.log("registrar");
+            },
+            enviar(){
+                const app=this;
+                axios.post('/api/autorizaciones',this.nuevaAutorizacion).then((data)=>{
+                    app.proveedores[app.proveedores.indexOf(app.prov)].autorizaciones.push(data.data.autorizacion)
+                    app.prov.autorizaciones.push(data.data.autorizacion);
+                    app.tieneNroAutorizacion=true;
+                    app.showForm=false;
+                    app.mensageSuccess('Registrado','Autorizacion registrada para '+app.prov.razon_social+'!!!!');
+                }).catch((err)=>{
+                    console.error(err);
+                });
+            },
+            mensageSuccess(titulo,mensaje){
+              toastr.options = {"closeButton":false,"debug":false,"newestOnTop":false,"progressBar":false,"positionClass":"toast-top-right","preventDuplicates":false,"onclick":null,"showDuration":"300","hideDuration":"1000","timeOut":"5000","extendedTimeOut":"1000","showEasing":"swing","hideEasing":"linear","showMethod":"fadeIn","hideMethod":"fadeOut"};
+              toastr.success(mensaje,titulo);
+            },
+        }
+    });
+</script>
 @endsection
 
 @section('scripts')

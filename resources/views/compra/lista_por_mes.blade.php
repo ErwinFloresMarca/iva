@@ -19,7 +19,7 @@
                 </div>
                 <div class="col-5 ">
                 <div class="row justify-content-end">
-                   <a href="{{route('compra.excel',$mes->id)}}" class="btn btn-success"> GENERAR EXCEL</a> &nbsp; <a href="{{route('compra.pdf.carta',$mes->id)}}" class="btn btn-danger"> GENERAR PDF CARTA</a> &nbsp; <a href="{{route('compra.pdf.oficio',$mes->id)}}" class="btn btn-danger"> GENERAR PDF OFICIO</a> 
+                   <a href="{{route('compra.excel',$mes->id)}}" class="btn btn-success"> GENERAR EXCEL</a> &nbsp; <a href="{{route('compra.pdf.carta',$mes->id)}}" class="btn btn-danger"> GENERAR PDF CARTA</a> 
                 </div>
                 <div class="col"></div>
             </div>
@@ -91,7 +91,13 @@
                     <td>{{$compra->proveedor->razon_social}}</td>
                     <td>{{$compra->nro_factura}}</td>
                     <td></td>
-                    <td>{{$compra->proveedor->nro_autorizacion}}</td>
+                    <td>
+                        @php 
+                        $auth=App\Autorizacion::obtenerNroAutorizacion($compra->proveedor->id,$mes->gestion->id);
+                        $msn='<div class="alert alert-danger" role="alert">no tiene!!!</div>';
+                        @endphp
+                        {!!(($auth!=null)? $auth->nro_autorizacion : $msn) !!}
+                    </td>
                     <td>{{$compra->importe}}</td>
                     <td>{{$compra->importe*0.3}}</td>
                     <td>{{$compra->importe-($compra->importe*0.3)}}</td>

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Autorizacion;
+use App\Gestion;
 use App\Proveedor;
+use App\User;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 
@@ -17,7 +20,13 @@ class ProveedorController extends Controller
     public function index()
     {
         $proveedores=Proveedor::all();
-        return view('proveedor.index')->with('proveedores',$proveedores);
+        $provs=array();
+        foreach($proveedores as $proveedor){
+            if(!count($proveedor->user)>=1){
+                $provs[]=$proveedor;
+            }
+        }
+        return view('proveedor.index')->with('proveedores',$provs);
     }
 
     /**
@@ -38,27 +47,43 @@ class ProveedorController extends Controller
      */
     public function store(Request $request)
     {
+        $accept = request()->header('accept');
 
         $this->validate($request, [
             'NIT' => 'required|unique:proveedores',
             'razon_social' => 'required|unique:proveedores',
-            'nro_autorizacion' => 'required|unique:proveedores',
         ],[
             'NIT.required' => 'El NIT es requerido.',
             'NIT.unique' =>'El NIT ya se encuentra registrado.',
             'razon_social.required' => 'La Razon Social es requerido.',
             'razon_social.unique' =>'La Razon Social ya se encuentra registrado.',
-            'nro_autorizacion.required' => 'El Numero de Autorizacion es requerido.',
-            'nro_autorizacion.unique' =>'El Numero de Autorizacion ya se encuentra registrado.'
         ]);
-
         $nuevo=new Proveedor();
         $nuevo->NIT=$request->NIT;
         $nuevo->razon_social=$request->razon_social;
-        $nuevo->nro_autorizacion=$request->nro_autorizacion;
         $nuevo->save();
-        Toastr::success('Proveedor '.$nuevo->razon_social.' creado exitosamente', 'Proveedor Creado', ["positionClass" => "toast-top-right"]);
-        return redirect('proveedor');
+        if($request->nro_autorizacion != null){
+            $auth=new Autorizacion();
+            $auth->nro_autorizacion=$request->nro_autorizacion;
+            $auth->proveedor_id=$nuevo->id;
+            $auth->gestion_id=Gestion::ultimaGestion()->id;
+            $auth->save();
+        }
+
+         // application/json
+        if($request->userId){
+            $user = User::find($request->userId);
+            $user->proveedor_id = $nuevo->id;
+            $user->save();
+        }
+        if( strpos($accept,'application/json')!= 1 )
+        {
+            return json_encode(['msn'=>'registro exitoso','proveedor'=>$nuevo]);
+        }
+        else{
+            Toastr::success('Proveedor '.$nuevo->razon_social.' creado exitosamente', 'Proveedor Creado', ["positionClass" => "toast-top-right"]);
+            return redirect('proveedor');
+        }
     }
 
     /**
@@ -118,6 +143,7 @@ class ProveedorController extends Controller
         $this->validate($request,$campos ,$mensages);
 
         $proveedor->save();
+        Toastr::success('Proveedor '.$proveedor->razon_social.' actualizado exitosamente', 'Proveedor Actualizado', ["positionClass" => "toast-top-right"]);
         return redirect(route('proveedor.index')); 
     }
 

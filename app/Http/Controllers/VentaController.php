@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Compra;
-use App\Exports\ComprasExportView;
+use App\Cliente;
+use App\Venta;
+use App\Exports\VentasExportView;
 use App\Mes;
 use App\Proveedor;
 use Illuminate\Auth\Events\Validated;
@@ -13,7 +14,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\App;
 use Maatwebsite\Excel\Facades\Excel;
 
-class CompraController extends Controller
+class VentaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,8 +28,8 @@ class CompraController extends Controller
 
     public function lista_por_Mes(Mes $mes)
     {
-        $mes->compras;
-        return view('compra.lista_por_mes')->with('mes',$mes);
+        $mes->ventas;
+        return view('venta.lista_por_mes')->with('mes',$mes);
     }
 
     /**
@@ -45,9 +46,9 @@ class CompraController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function createCompra(Mes $mes)
+    public function createVenta(Mes $mes)
     {
-        return view('compra.create')->with('mes',$mes)->with('proveedores',Proveedor::all());
+        return view('venta.create')->with('mes',$mes)->with('clientes',Cliente::all());
     }
 
     /**
@@ -60,53 +61,48 @@ class CompraController extends Controller
     {
         $campos=array();
         $mensages=[
-            'proveedor_id.required'=>'debe seleccionar un Proveedor',
-            'NIT.required' => 'El NIT es requerido.',
-            'NIT.unique' =>'El NIT ya se encuentra registrado.',
-            'razon_social.required' => 'La Razon Social es requerido.',
-            'razon_social.unique' =>'La Razon Social ya se encuentra registrado.',
-            'nro_autorizacion.required' => 'El Numero de Autorizacion es requerido.',
-            'nro_autorizacion.unique' =>'El Numero de Autorizacion ya se encuentra registrado.',
+            'cliente_id.required'=>'debe seleccionar un cliente',
+            'nit_ci.required' => 'El nit_ci es requerido.',
+            'nombre_rs.required' => 'El Nombre o Razon Social es requerido.',
             'fecha.required'=>'La fecha es requerida.',
+            'estado.required'=>'El estado es requerida.',
             'nro_factura.required'=>'El campo Numero de factura debe tener algun valor.',
             'nro_factura.unique'=>'Este numero de factura ya existe',
             'importe.required'=>'El campo Importe es Requerido.'
         ];
-        if($request->prooveedorSeleccionado=='true'){
-            $campos['proveedor_id']='required';
+        if($request->clienteSeleccionado=='true'){
+            $campos['cliente_id']='required';
         }
-        if($request->nuevoProveedor=='true'){
-            $campos['NIT'] = 'required|unique:proveedores';
-            $campos['razon_social'] = 'required|unique:proveedores';
-            $campos['nro_autorizacion'] = 'required|unique:proveedores';
+        if($request->nuevoCliente=='true'){
+            $campos['nombre_rs'] = 'required';
         }
         $campos['fecha']='required';
-        $campos['nro_factura']='required|unique:compras';
+        $campos['nro_factura']='required|unique:ventas';
         $campos['importe']='required';
         $this->validate($request,$campos,$mensages);
-        $proveedor=null;
-        if($request->nuevoProveedor=='true'){
-            $proveedor=new Proveedor();
-            $proveedor->NIT=$request->NIT;
-            $proveedor->razon_social=$request->razon_social;
-            $proveedor->nro_autorizacion=$request->nro_autorizacion;
-            $proveedor->save();
+        $cliente=null;
+        if($request->nuevoCliente=='true'){
+            $cliente=new Cliente();
+            $cliente->nit_ci=($request->nit_ci)? $request->nit_ci: '';
+            $cliente->nombre_rs=$request->nombre_rs;
+            $cliente->save();
         }
         else{
-            $proveedor=Proveedor::find($request->proveedor_id);
+            $cliente=Cliente::find($request->cliente_id);
         }
-        $nuevaCompra=new Compra();
-        $nuevaCompra->especificacion=$request->especificacion;
-        $nuevaCompra->mes_id=$request->mes_id;
-        $nuevaCompra->proveedor_id=$proveedor->id;
-        $nuevaCompra->fecha=$request->fecha;
-        $nuevaCompra->nro_factura=$request->nro_factura;
-        $nuevaCompra->importe=$request->importe;
-        $nuevaCompra->cod_control=$request->cod_control;
-        $nuevaCompra->save();
         
+        $nuevaVenta= new Venta();
+        $nuevaVenta->especificacion=$request->especificacion;
+        $nuevaVenta->cliente_id = $cliente->id;
+        $nuevaVenta->mes_id = $request->mes_id;
+        $nuevaVenta->nro_factura = $request->nro_factura;
+        $nuevaVenta->fecha = $request->fecha ;
+        $nuevaVenta->estado = $request->estado ;
+        $nuevaVenta->importe = $request->importe ;
+        $nuevaVenta->cod_control = ($request->cod_control)? $request->cod_control: "" ;
+        $nuevaVenta->save();
         Toastr::success('creado exitosamente', 'Creado', ["positionClass" => "toast-top-right"]);
-        return redirect(route('compra.mes',$request->mes_id));
+        return redirect(route('venta.mes',$request->mes_id));
     }
 
     /**
@@ -115,7 +111,7 @@ class CompraController extends Controller
      * @param  \App\Compra  $compra
      * @return \Illuminate\Http\Response
      */
-    public function show(Compra $compra)
+    public function show(Venta $venta)
     {
         //
     }
@@ -126,9 +122,10 @@ class CompraController extends Controller
      * @param  \App\Compra  $compra
      * @return \Illuminate\Http\Response
      */
-    public function edit(Compra $compra)
+    public function edit($id)
     {
-        return view('compra.edit')->with('compra',$compra)->with('mes',$compra->mes)->with('proveedores',Proveedor::all());
+        $venta=Venta::find($id);
+        return view('venta.edit')->with('venta',$venta)->with('mes',$venta->mes)->with('clientes',Cliente::all());
     }
 
     /**
@@ -138,42 +135,41 @@ class CompraController extends Controller
      * @param  \App\Compra  $compra
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Compra $compra)
+    public function update(Request $request,$id)
     {
-
+        $venta=Venta::find($id);
         $campos=array();
 
         $mensages=array();
 
-        if($compra->fecha!=$request->fecha){
+        if($venta->fecha!=$request->fecha){
             $campos['fecha']='required';
             $mensages['fecha.required']='El campo fecha no puede estar vacio.';
-            $compra->fecha=$request->fecha;
+            $venta->fecha=$request->fecha;
         }
-        if($compra->nro_factura!=$request->nro_factura){
-            $campos['nro_factura']='required|unique:compras';
+        if($venta->nro_factura!=$request->nro_factura){
+            $campos['nro_factura']='required|unique:ventas';
             $mensages['nro_factura.required']='El numero de factura debe tener algun valor.';
             $mensages['nro_factura.unique']='El numero de factura ya se encuentra registrado.';
-            $compra->nro_factura=$request->nro_factura;
+            $venta->nro_factura=$request->nro_factura;
         }
-        if($compra->importe!=$request->importe){
+        if($venta->importe!=$request->importe){
             $campos['importe']='required';
             $mensages['importe.required']='El importe es requerido.';
-            $compra->importe=$request->importe;
+            $venta->importe=$request->importe;
         }
-        if($compra->cod_control!=$request->cod_control){
-            $campos['cod_control']='required|unique:compras';
+        if($venta->cod_control!=$request->cod_control){
+            $campos['cod_control']='required';
             $mensages['cod_control.required']='El Codigo de Controles requerido.';
-            $mensages['cod_control.unique']='El codigo de control ya se encuentra registrado.';
-            $compra->cod_control=$request->cod_control;
+            $venta->cod_control=$request->cod_control;
         }
-        $compra->especificacion=$request->especificacion;
+        $venta->especificacion=$request->especificacion;
 
         $this->validate($request,$campos ,$mensages);
-        $compra->proveedor_id=$request->proveedor_id;
-        $compra->save();
-        Toastr::success('registro con numero de factura '.$compra->nro_factura.' actualizado exitosamente!!!', 'Actualizacion Exitosa', ["positionClass" => "toast-top-right"]);
-        return redirect(route('compra.mes',$compra->mes_id));
+        $venta->cliente_id=$request->cliente_id;
+        $venta->save();
+        Toastr::success('registro con numero de factura '.$venta->nro_factura.'actualizado exitosamente!!!', 'Actualizacion Exitosa', ["positionClass" => "toast-top-right"]);
+        return redirect(route('venta.mes',$venta->mes_id));
     }
 
     /**
@@ -182,25 +178,25 @@ class CompraController extends Controller
      * @param  \App\Compra  $compra
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Compra $compra)
+    public function destroy($id)
     {
-        $compra->delete();
-        Toastr::success('Registro con nuemro de factura '.$compra->nro_factura.' eliminado!!!', 'Eliminado', ["positionClass" => "toast-top-right"]);
-        return redirect(route('compra.mes',$compra->mes_id));
+        $venta=Venta::find($id);
+        $venta->delete();
+        Toastr::success('Registro con nuemro de factura '.$venta->nro_factura.' eliminado!!!', 'Eliminado', ["positionClass" => "toast-top-right"]);
+        return redirect(route('venta.mes',$venta->mes_id));
     }
 
     public function destroyAll(Mes $mes)
     {
-        foreach($mes->compras as $compra)
-            $compra->delete();
+        foreach($mes->ventas as $venta)
+            $venta->delete();
         Toastr::success('Todos los registros fueron eliminados!!!', 'Eliminado', ["positionClass" => "toast-top-right"]);
-        return redirect(route('compra.mes',$mes->id));
+        return redirect(route('venta.mes',$mes->id));
     }
-
     public function generarPDFcarta(Mes $mes){
         $pdf = App::make('dompdf.wrapper');
         $pdf->setPaper('letter', 'landscape');
-        $pdf->loadView('compra.libro_carta',[
+        $pdf->loadView('venta.libro_carta',[
             'mes'=>$mes
         ]);
         return $pdf->stream();
@@ -208,7 +204,7 @@ class CompraController extends Controller
     public function generarPDFoficio(Mes $mes){
         $pdf = App::make('dompdf.wrapper');
         $pdf->setPaper('folio', 'landscape');
-        $pdf->loadView('compra.libro_oficio',[
+        $pdf->loadView('venta.libro_oficio',[
             'mes'=>$mes
         ]);
         return $pdf->stream();
@@ -258,6 +254,6 @@ class CompraController extends Controller
         return response()->download("./ejemplo_excel.xlsx");
         //return Response::download($result, 'filename.xlsx', $headers);
         //return $result;*/
-        return Excel::download(new ComprasExportView($mes->id),'LIBRO_COMPRAS_IVA_'.$mes->mes.'_'.$mes->gestion->gestion.'_POTOSI.xlsx');
+        return Excel::download(new VentasExportView($mes->id),'LIBRO_Ventas_IVA_'.$mes->mes.'_'.$mes->gestion->gestion.'_POTOSI.xlsx');
     }
 }

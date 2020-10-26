@@ -51,7 +51,7 @@
                             <div class="col-2"></div>
                             <div class="col-5">
                                 <div class="row justify-content-start">
-                                <a href="{{route('compra.mes',$mes)}}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{route('venta.mes',$mes)}}" class="btn btn-sm btn-outline-primary">
                                     VENTAS
                                 </a>
                                 </div>
