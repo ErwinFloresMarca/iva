@@ -48,22 +48,28 @@ class ProveedorController extends Controller
     public function store(Request $request)
     {
         $accept = request()->header('accept');
-
-        $this->validate($request, [
+        $rules = [
             'NIT' => 'required|unique:proveedores',
             'razon_social' => 'required|unique:proveedores',
-        ],[
+            
+        ];
+        $msns = [
             'NIT.required' => 'El NIT es requerido.',
             'NIT.unique' =>'El NIT ya se encuentra registrado.',
             'razon_social.required' => 'La Razon Social es requerido.',
             'razon_social.unique' =>'La Razon Social ya se encuentra registrado.',
-        ]);
+        ];
+        if($request->nro_autorizacion){
+            $rules['nro_autorizacion']= 'numeric';
+            $msns['nro_autorizacion.numeric'] = 'El numero de autorizacion solo debe contener numeros';
+        }
+        $this->validate($request, $rules,$msns);
         $nuevo=new Proveedor();
         $nuevo->NIT=$request->NIT;
         $nuevo->razon_social=$request->razon_social;
         $nuevo->save();
+        $auth=new Autorizacion();
         if($request->nro_autorizacion != null){
-            $auth=new Autorizacion();
             $auth->nro_autorizacion=$request->nro_autorizacion;
             $auth->proveedor_id=$nuevo->id;
             $auth->gestion_id=Gestion::ultimaGestion()->id;
@@ -78,7 +84,11 @@ class ProveedorController extends Controller
         }
         if( strpos($accept,'application/json')!= 1 )
         {
-            return json_encode(['msn'=>'registro exitoso','proveedor'=>$nuevo]);
+            $res = ['msn'=>'registro exitoso','proveedor'=>$nuevo];
+            if($request->nro_autorizacion){
+                $res['autorizacion']= $auth;
+            }
+            return json_encode($res);
         }
         else{
             Toastr::success('Proveedor '.$nuevo->razon_social.' creado exitosamente', 'Proveedor Creado', ["positionClass" => "toast-top-right"]);

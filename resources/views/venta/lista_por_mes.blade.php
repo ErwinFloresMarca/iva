@@ -10,16 +10,40 @@ const app=new Vue({
             user: {!! Auth::user() !!},
             nuevoProv: {},
             showFormProveedor: false,
-            error: null,
+            proveedorLoading: false,
+            error: {},
+            numeroDeAuthorizacion: {!! (Auth::user()->proveedor)? ( App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,App\Gestion::ultimaGestion()->id)? App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,App\Gestion::ultimaGestion()->id): 'null' ) : 'null' !!},
         };
     },
     methods: {
         confirmar(){
+            this.proveedorLoading = true;
             this.nuevoProv.userId = this.user.id,
             axios.post('/api/proveedor',this.nuevoProv).then((data)=>{
-                console.log(data);
+                this.proveedor = data.data.proveedor;
+                if(data.data.autorizacion)
+                    this.numeroDeAuthorizacion = data.data.autorizacion;
+                this.$message({
+                    message: "Informacion Registrada",
+                    type: 'success',
+                    showClose: true,
+                });
+                this.proveedorLoading = false;
+                this.showFormProveedor = false;
             }).catch((error)=>{
-                this.error = error; 
+                this.error = {};
+                if(error.request){
+                    let errors = JSON.parse(error.request.response).errors;
+                    this.error = errors;
+                    if(this.error==null)
+                        this.error = {};
+                }
+                 
+                this.$message({
+                    message: error.toString(),
+                    type: "error",
+                    showClose: true
+                });
             });
         },
     },
@@ -40,14 +64,14 @@ const app=new Vue({
             Registrar Proveedor
         </div>
         
-        <el-form label-width="120px">
-            <el-form-item label="NIT">
+        <el-form label-width="120px" loading>
+            <el-form-item label="NIT" :error="(error.NIT)? error.NIT[0]:null">
                 <el-input v-model="nuevoProv.NIT"></el-input>
             </el-form-item>
-            <el-form-item label="Razon Social">
+            <el-form-item label="Razon Social" :error="(error.razon_social)? error.razon_social[0]:null">
                 <el-input v-model="nuevoProv.razon_social"></el-input>
             </el-form-item>
-            <el-form-item label="Nro. Autorizacion">
+            <el-form-item label="Nro. Autorizacion" :error="(error.nro_autorizacion)? error.nro_autorizacion[0]:null">
                 <el-input v-model="nuevoProv.nro_autorizacion"></el-input>
             </el-form-item>
         </el-form>
@@ -154,7 +178,12 @@ const app=new Vue({
                     <td>{{Utils::formatDate($venta->fecha)}}</td>
                     <td>{{$venta->nro_factura}}</td>
                     <td>
-                        <!-- numero de autorizacion Datos Administrativos -->
+                        <div v-if='numeroDeAuthorizacion'>
+                            @{{ numeroDeAuthorizacion.nro_autorizacion }}
+                        </div>
+                        <div v-else>
+                            <el-button type="danger" plain>Registrar</el-button>
+                        </div>
                     </td>
                     <td>{{($venta->estado)?"V":"A"}}</td>
                     <td>{{$venta->cliente->nit_ci}}</td>
@@ -167,7 +196,7 @@ const app=new Vue({
                     <td>{{'0,00'}}</td>
                     <td>{{$venta->importe}}</td>
                     <td>{{getWhitTwooDecimals($venta->importe*0.13)}}</td>
-                    <td></td>
+                    <td>{{$venta->cod_control}}</td>
                     <td>
                     
                                 <a href="{{route('venta.edit',$venta)}}" class="btn btn-warning btn-sm">
