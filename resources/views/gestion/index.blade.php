@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('body_options')
-background='{{asset("img/archivo.jpg")}}' style='background-size: cover;'
+background='{{asset("img/archivos.jpg")}}' style='background-size: cover;'
 @endsection
 @section('content')
 <div>
@@ -15,7 +15,7 @@ background='{{asset("img/archivo.jpg")}}' style='background-size: cover;'
         
             <br>
             <br>
-            <table  class="table">
+            <table  class="table" style="background: rgb(255, 255, 255,0.5)">
                 <thead>
                 <tr>
                 <th>Gestion</th>

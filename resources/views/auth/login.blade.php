@@ -1,14 +1,12 @@
 @extends('layouts.app')
 
 @section('body_options')
-    background='{{asset("img/iniaf2.jpg")}}' style='background-size: cover;'
+    background='{{asset("img/principal.jpg")}}' style='background-size: cover;'
 @endsection
 
 @section('content')
 <div class="container"  style="background:rgb(0,0,0,0.0);">
-    <div class="row justify-content-center" >     
-        <img  height="150" src='{{asset("img/iniaf.jpg")}}' style="margin:50px"/>  
-    </div>
+    <br><br><br><br><br><br><br><br><br>
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div style="background:rgba(255,255,255,0.4);" class="card card-success" >
@@ -61,14 +59,12 @@
                         <div class="form-group row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
+                                    {{ __('Iniciar Sesion') }}
                                 </button>
-
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
+                                &nbsp;
+                                <a href="{{ route('register') }}" class="btn btn-primary" style="color:white">
+                                    {{ __('REGISTRAR') }}
+                                </a>
                             </div>
                         </div>
                     </form>

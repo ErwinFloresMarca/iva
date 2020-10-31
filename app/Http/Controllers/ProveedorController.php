@@ -82,7 +82,7 @@ class ProveedorController extends Controller
             $user->proveedor_id = $nuevo->id;
             $user->save();
         }
-        if( strpos($accept,'application/json')!= 1 )
+        if( strpos($accept,'application/json'))
         {
             $res = ['msn'=>'registro exitoso','proveedor'=>$nuevo];
             if($request->nro_autorizacion){
@@ -128,7 +128,7 @@ class ProveedorController extends Controller
     public function update(Request $request, Proveedor $proveedor)
     {
         $campos=array();
-
+        $accept = request()->header('accept');
         $mensages=array();
         if($proveedor->NIT!=$request->NIT){
             $campos['NIT']='required|unique:proveedores';
@@ -142,19 +142,19 @@ class ProveedorController extends Controller
             $mensages['razon_social.unique']='La Razon Social ya se encuentra registrado.';
             $proveedor->razon_social=$request->razon_social;
         }
-        if($proveedor->nro_autorizacion!=$request->nro_autorizacion){
-            $campos['nro_autorizacion']='required|unique:proveedores';
-            $mensages['nro_autorizacion.required']='El Numero de Autorizacion es requerido.';
-            $mensages['nro_autorizacion.unique']='El Numero de Autorizacion ya se encuentra registrado.';
-            $proveedor->nro_autorizacion=$request->nro_autorizacion;
-        } 
-
-
         $this->validate($request,$campos ,$mensages);
 
         $proveedor->save();
-        Toastr::success('Proveedor '.$proveedor->razon_social.' actualizado exitosamente', 'Proveedor Actualizado', ["positionClass" => "toast-top-right"]);
-        return redirect(route('proveedor.index')); 
+
+        $res = strpos($accept,'application/json');
+        
+        if( $res == 0 ){
+            return response()->json(['proveedor'=>$proveedor]);
+        }else{
+            Toastr::success('Proveedor '.$proveedor->razon_social.' actualizado exitosamente', 'Proveedor Actualizado', ["positionClass" => "toast-top-right"]);
+            return redirect(route('proveedor.index')); 
+        }
+
     }
 
     /**
@@ -166,6 +166,7 @@ class ProveedorController extends Controller
     public function destroy(Proveedor $proveedor)
     {
         $proveedor->delete();
+        Toastr::success('Proveedor '.$proveedor->razon_social.' eliminado', 'Proveedor Eliminado', ["positionClass" => "toast-top-right"]);
         return redirect(route('proveedor.index'));
     }
 }

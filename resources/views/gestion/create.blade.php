@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('body_options')
-background='{{asset("img/archivo.jpg")}}' style='background-size: cover;'
+background='{{asset("img/general.jpg")}}' style='background-size: cover;'
 @endsection
 
 @section('content')
 
 <div class='row justify-content-center'>
 <div class="col-sm-6">
-        <div class="card card-success" style="background: rgb(255, 255, 255,0.3)" >
+        <div class="card card-success" style="background: rgb(255, 255, 255,0.5)" >
               <div class="card-header">
                 <h3 class="">Nuevo Gestion</h3>
               </div>

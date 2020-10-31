@@ -1,10 +1,14 @@
 @extends('layouts.app')
 
+@section('body_options')
+background='{{asset("img/clientes.jpg")}}' style='background-size: cover;'
+@endsection
+
 @section('content')
 
 <div class='row justify-content-center'>
 <div class="col-sm-6">
-        <div class="card card-success">
+        <div class="card card-success" style="background: rgb(255, 255, 255,0.5)">
               <div class="card-header">
                 <h3 class="card-title">Nuevo Cliente</h3>
               </div>
@@ -53,10 +57,8 @@
                         </form>
                         <div class="col-5">
                             <a href="{{route('cliente.index')}}" class='btn btn-danger'>Cancelar</a>
-                        </div>
-                        
-                    
-                  </div>
+                        </div>  
+                </div>
               
             </div>
 </div>

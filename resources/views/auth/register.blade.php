@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('body_options')
-    background='{{asset("img/iniaf2.jpg")}}' style='background-size: cover;'
+    background='{{asset("img/principal.jpg")}}' style='background-size: cover;'
 @endsection
 
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card card-success">
+            <div class="card card-success" style="background: rgb(255, 255, 255,0.5)">
                 <div class="card-header">{{ __('Register') }}</div>
 
                 <div class="card-body">
@@ -84,8 +84,10 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Register') }}
                                 </button>
+                                <a href="/" class="btn btn-danger" style="color: white;">Cancelar</a>
                             </div>
                         </div>
+                        
                     </form>
                 </div>
             </div>

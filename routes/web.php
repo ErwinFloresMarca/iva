@@ -60,3 +60,4 @@ Route::delete('/venta/destroy/{mes}','VentaController@destroyAll')->name('venta.
 
 Route::resource('/venta','VentaController');
 
+Route::get('/config/{user}','UserController@show')->name('user.config');

@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('body_options')
+background='{{asset("img/proveedor.jpg")}}' style='background-size: cover;'
+@endsection
+
 @section('content')
 <div id="app">
     <a href="{{route('proveedor.create')}}" class="btn btn-success">
@@ -8,7 +12,7 @@
     </a>
     
     <br>
-    <table  class="table">
+    <table  class="table" style="background: rgb(255, 255, 255,0.5)">
             <thead>
             <tr>
               <th>NIT</th>
@@ -109,7 +113,6 @@
                 this.nuevaAutorizacion={};
                 this.nuevaAutorizacion.proveedor_id=proveedor_id;
                 this.nuevaAutorizacion.gestion_id=this.gestion.id;
-                console.log("registrar");
             },
             enviar(){
                 const app=this;

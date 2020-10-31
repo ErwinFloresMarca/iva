@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('body_options')
+background='{{asset("img/clientes.jpg")}}' style='background-size: cover;'
+@endsection
+
 @section('content')
 <div>
     <a href="{{route('cliente.create')}}" class="btn btn-success">
@@ -8,7 +12,7 @@
     </a>
     
     <br>
-    <table  class="table">
+    <table  class="table" style="background: rgb(255, 255, 255,0.5)">
             <thead>
             <tr>
               <th>CI o NIT</th>

@@ -12,10 +12,34 @@ const app=new Vue({
             showFormProveedor: false,
             proveedorLoading: false,
             error: {},
-            numeroDeAuthorizacion: {!! (Auth::user()->proveedor)? ( App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,App\Gestion::ultimaGestion()->id)? App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,App\Gestion::ultimaGestion()->id): 'null' ) : 'null' !!},
+            gestion: {!! json_encode($mes->gestion) !!},
+            showForm: false,
+            nuevaAutorizacion: {},
+            numeroDeAuthorizacion: {!! (Auth::user()->proveedor)? ( App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,$mes->gestion->id)? App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,$mes->gestion->id): 'null' ) : 'null' !!},
         };
     },
     methods: {
+        registrarNumAuth(){
+            this.showForm=true;
+            this.nuevaAutorizacion={};
+            this.nuevaAutorizacion.proveedor_id=this.proveedor.id;
+            this.nuevaAutorizacion.gestion_id=this.gestion.id;
+        },
+
+        enviar(){
+            const app=this;
+            axios.post('/api/autorizaciones',this.nuevaAutorizacion).then((data)=>{
+                app.numeroDeAuthorizacion=data.data.autorizacion;
+                app.showForm=false;
+                app.mensageSuccess('Registrado','Autorizacion registrada!!!!');
+            }).catch((err)=>{
+                console.error(err);
+            });
+        },
+        mensageSuccess(titulo,mensaje){
+            toastr.options = {"closeButton":false,"debug":false,"newestOnTop":false,"progressBar":false,"positionClass":"toast-top-right","preventDuplicates":false,"onclick":null,"showDuration":"300","hideDuration":"1000","timeOut":"5000","extendedTimeOut":"1000","showEasing":"swing","hideEasing":"linear","showMethod":"fadeIn","hideMethod":"fadeOut"};
+            toastr.success(mensaje,titulo);
+        },
         confirmar(){
             this.proveedorLoading = true;
             this.nuevoProv.userId = this.user.id,
@@ -107,7 +131,7 @@ const app=new Vue({
                 </div>
                 <div class="col-5 ">
                 <div class="row justify-content-end">
-                   <a href="{{route('venta.excel',$mes->id)}}" class="btn btn-success"> GENERAR EXCEL</a> &nbsp; <a href="{{route('venta.pdf.carta',$mes->id)}}" class="btn btn-danger"> GENERAR PDF CARTA</a> &nbsp; <a href="{{route('venta.pdf.oficio',$mes->id)}}" class="btn btn-danger"> GENERAR PDF OFICIO</a> 
+                   <a href="{{route('venta.excel',$mes->id)}}" class="btn btn-success"> GENERAR EXCEL</a> &nbsp; <a href="{{route('venta.pdf.carta',$mes->id)}}" class="btn btn-danger"> GENERAR PDF CARTA</a> 
                 </div>
                 <div class="col"></div>
             </div>
@@ -182,7 +206,7 @@ const app=new Vue({
                             @{{ numeroDeAuthorizacion.nro_autorizacion }}
                         </div>
                         <div v-else>
-                            <el-button type="danger" plain>Registrar</el-button>
+                            <el-button @click="registrarNumAuth()" type="danger" plain>Registrar</el-button>
                         </div>
                     </td>
                     <td>{{($venta->estado)?"V":"A"}}</td>
@@ -244,7 +268,30 @@ const app=new Vue({
         </div>
     </div>
     
-    
+    <div :class="{modal: true, fade: true, show: showForm }" :style="'display: '+((showForm)? 'block': 'none') " id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" :aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nueva Autorizacion</h5>
+                <button @click="showForm=false" type="button" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Numero de Autorizacion</label>
+                    <input type="number" v-model="nuevaAutorizacion.nro_autorizacion" class="form-control" placeholder="introduzca numero de autorizacion">
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @click="showForm=false">Cerrar</button>
+                <button type="button" class="btn btn-primary" @click="enviar">Guardar Cambios</button>
+            </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection

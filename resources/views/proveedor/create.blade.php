@@ -1,10 +1,14 @@
 @extends('layouts.app')
 
+@section('body_options')
+background='{{asset("img/proveedor.jpg")}}' style='background-size: cover;'
+@endsection
+
 @section('content')
 
 <div class='row justify-content-center'>
 <div class="col-sm-6">
-        <div class="card card-primary">
+        <div class="card card-primary" style="background: rgb(255, 255, 255,0.5)">
               <div class="card-header">
                 <h3 class="card-title">Nuevo Proveedor</h3>
               </div>
@@ -53,9 +57,19 @@
                 <!-- /.card-body -->
 
                 <div class="card-footer">
-                  <button type="submit" class="btn btn-primary">Guardar</button>
+                    <div class="row justify-content-center">
+                        <div class="col-5">
+                            <div class='row justify-content-end'>
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                            </div>
+                           
+                        </div>
+                        <div class='col-2'></div>
+                        </form>
+                        <div class="col-5">
+                            <a href="{{route('proveedor.index')}}" class='btn btn-danger'>Cancelar</a>
+                        </div>  
                 </div>
-              </form>
             </div>
 </div>
 </div>

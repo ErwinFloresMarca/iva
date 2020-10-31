@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource('autorizaciones','AutorizacionController');
 
 Route::apiResource('proveedor','ProveedorController');
+Route::post('/user/upload_avatar/{user}','UserController@uploadAvatar');
+Route::apiResource('user','UserController');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

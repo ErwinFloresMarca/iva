@@ -38,7 +38,7 @@
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                        {{ __('Cerrar sesion') }}
                                     </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -72,10 +72,10 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{{asset('dist/img/avatar.png')}}" class="img-circle elevation-2" alt="User Image">
+          <img src="{!! Auth::user()->avatar? Illuminate\Support\Facades\Storage::url(Auth::user()->avatar->url): asset('dist/img/avatar.png') !!}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">{{Auth::user()->name}}</a>
+          <a href="{{route('user.config',Auth::user())}}" class="d-block">{{Auth::user()->name}}</a>
         </div>
       </div>
 
@@ -86,13 +86,13 @@
           <li class="nav-header">IVA</li>
             <li class="nav-item">
               <a href="{{route('proveedor.index')}}" class="nav-link">
-                <i class="fas fa-book nav-icon"></i>
+                <i class="fas fa-briefcase nav-icon"></i>
                 <p>Proveedores</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{route('cliente.index')}}" class="nav-link">
-                <i class="fas fa-book nav-icon"></i>
+                <i class="fas fa-user nav-icon"></i>
                 <p>Cliente</p>
               </a>
             </li>
@@ -100,6 +100,12 @@
               <a href="{{route('gestion.index')}}" class="nav-link">
                 <i class="fas fa-book nav-icon"></i>
                 <p>Gestiones</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{route('user.config',Auth::user())}}" class="nav-link">
+                <i class="fas fa-cog nav-icon"></i>
+                <p>Configuraciones</p>
               </a>
             </li>
            
@@ -114,7 +120,7 @@
 @endswitch
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper"  style="background:rgb(0,0,0,0.0)">
-   
+    <br>
     @yield('content')
   </div>
   <!-- /.content-wrapper -->

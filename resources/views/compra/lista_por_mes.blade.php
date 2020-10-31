@@ -1,7 +1,48 @@
 @extends('layouts.app')
 
+@section('scripts')
+<script>
+const app=new Vue({
+    el: '#app',
+    data(){
+        return {
+            authsNumevos: [],
+            gestion: {!! json_encode($mes->gestion) !!},
+            nuevaAutorizacion:{},
+            showForm: false,
+        };
+    },
+    methods: {
+
+        registrarNumAuth(id){
+            this.showForm=true;
+            this.nuevaAutorizacion={};
+            this.nuevaAutorizacion.proveedor_id=id;
+            this.nuevaAutorizacion.gestion_id=this.gestion.id;
+        },
+
+        enviar(){
+            const app=this;
+            axios.post('/api/autorizaciones',this.nuevaAutorizacion).then((data)=>{
+                app.authsNumevos[app.nuevaAutorizacion.proveedor_id]=data.data.autorizacion.nro_autorizacion;
+                app.showForm=false;
+                app.mensageSuccess('Registrado','Autorizacion registrada!!!!');
+            }).catch((err)=>{
+                console.error(err);
+            });
+        },
+        mensageSuccess(titulo,mensaje){
+            toastr.options = {"closeButton":false,"debug":false,"newestOnTop":false,"progressBar":false,"positionClass":"toast-top-right","preventDuplicates":false,"onclick":null,"showDuration":"300","hideDuration":"1000","timeOut":"5000","extendedTimeOut":"1000","showEasing":"swing","hideEasing":"linear","showMethod":"fadeIn","hideMethod":"fadeOut"};
+            toastr.success(mensaje,titulo);
+        },
+    },
+});  
+</script>
+@endsection
+
 @section('content')
-<div>
+<div id="app">
+    
     <div class="row justify-content-center"  style="font-family: Stencil">
         <h1>GESTION {{$mes->gestion->gestion}} / {{$mes->mes}}</h1>
 
@@ -94,9 +135,17 @@
                     <td>
                         @php 
                         $auth=App\Autorizacion::obtenerNroAutorizacion($compra->proveedor->id,$mes->gestion->id);
-                        $msn='<div class="alert alert-danger" role="alert">no tiene!!!</div>';
                         @endphp
-                        {!!(($auth!=null)? $auth->nro_autorizacion : $msn) !!}
+                        @if($auth!=null)
+                            {{$auth->nro_autorizacion}}
+                        @else
+                            <template v-if="authsNumevos['{!!$compra->proveedor->id!!}']">
+                                @{{authsNumevos['{!!$compra->proveedor->id!!}']}}
+                            </template>
+                            <template v-else>
+                                <el-button @click="registrarNumAuth({!!$compra->proveedor->id!!})" type="danger" plain>Registrar</el-button>
+                            </template>
+                        @endif
                     </td>
                     <td>{{$compra->importe}}</td>
                     <td>{{$compra->importe*0.3}}</td>
@@ -159,7 +208,30 @@
         </div>
     </div>
     
-    
+    <div :class="{modal: true, fade: true, show: showForm }" :style="'display: '+((showForm)? 'block': 'none') " id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" :aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nueva Autorizacion</h5>
+                <button @click="showForm=false" type="button" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Numero de Autorizacion</label>
+                    <input type="number" v-model="nuevaAutorizacion.nro_autorizacion" class="form-control" placeholder="introduzca numero de autorizacion">
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @click="showForm=false">Cerrar</button>
+                <button type="button" class="btn btn-primary" @click="enviar">Guardar Cambios</button>
+            </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection

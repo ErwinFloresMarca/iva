@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('body_options')
+background='{{asset("img/archivos.jpg")}}' style='background-size: cover;'
+@endsection
+
 @section('content')
 <div>
     <div class="row justify-content-center">
@@ -19,7 +23,7 @@
         
             <br>
             <br>
-            <table  class="table align-content-center">
+            <table  class="table align-content-center" style="background: rgb(255, 255, 255,0.5)">
                 <thead>
                    
                 <tr>

@@ -127,7 +127,7 @@
                       <label for="razon_social">Numero de Factura</label>
                       
                       <div class="col">
-                          <input id="nro_factura" type="number" class="form-control @error('nro_factura') is-invalid @enderror" name="nro_factura" value="{{ old('nro_factura') }}" required  >
+                          <input id="nro_factura" type="number" class="form-control @error('nro_factura') is-invalid @enderror" name="nro_factura" value="{{ (old('nro_factura'))?old('nro_factura'): (App\Venta::max('nro_factura')?(App\Venta::max('nro_factura')+1):1)}}" required  >
 
                           @error('nro_factura')
                               <span class="invalid-feedback" role="alert">

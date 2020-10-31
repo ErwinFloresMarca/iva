@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Autorizacion;
 use App\Compra;
 use App\Exports\ComprasExportView;
+use App\Gestion;
 use App\Mes;
 use App\Proveedor;
 use Illuminate\Auth\Events\Validated;
@@ -78,7 +80,7 @@ class CompraController extends Controller
         if($request->nuevoProveedor=='true'){
             $campos['NIT'] = 'required|unique:proveedores';
             $campos['razon_social'] = 'required|unique:proveedores';
-            $campos['nro_autorizacion'] = 'required|unique:proveedores';
+            $campos['nro_autorizacion'] = 'required|unique:autorizaciones';
         }
         $campos['fecha']='required';
         $campos['nro_factura']='required|unique:compras';
@@ -89,8 +91,14 @@ class CompraController extends Controller
             $proveedor=new Proveedor();
             $proveedor->NIT=$request->NIT;
             $proveedor->razon_social=$request->razon_social;
-            $proveedor->nro_autorizacion=$request->nro_autorizacion;
             $proveedor->save();
+            $auth=new Autorizacion();
+            if($request->nro_autorizacion != null){
+                $auth->nro_autorizacion=$request->nro_autorizacion;
+                $auth->proveedor_id=$proveedor->id;
+                $auth->gestion_id=Gestion::ultimaGestion()->id;
+                $auth->save();
+            }
         }
         else{
             $proveedor=Proveedor::find($request->proveedor_id);
