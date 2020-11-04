@@ -16,10 +16,19 @@ class Utils extends Model
         //       esp    no    fecha   nit    razon   fac    dui    aut   itcom  fiscal   sub   desc   base  cred    cod    tipo
         return ["25px","20px","45px","55px","200px","55px","40px","70px","55px","50px","45px","65px","50px","40px","65px","40px"];
     }
+    public static function getTamColumExcel(){
+        return ["4","4","12","13","39","10","7","19","11","11","10","12","11","9","15","8"];
+    }
     public static function sumPx($arr){
         $sum=0;
         foreach($arr as $pos)
             $sum+=str_replace("px","",Utils::getTamColumCarta()[$pos]);
+        return $sum;
+    }
+    public static function sum($arr){
+        $sum=0;
+        foreach($arr as $pos)
+            $sum+=Utils::getTamColumExcel()[$pos];
         return $sum;
     }
     public static function formatDate($date){

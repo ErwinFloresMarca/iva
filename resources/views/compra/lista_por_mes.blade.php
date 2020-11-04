@@ -41,6 +41,11 @@ const app=new Vue({
 @endsection
 
 @section('content')
+<style>
+    th {
+        border-color: black;
+    }
+</style>
 <div id="app">
     
     <div class="row justify-content-center"  style="font-family: Stencil">
@@ -82,7 +87,7 @@ const app=new Vue({
     
             <br>
             <table width="100%" border=2>
-                <thead style="background: #C8A2C8">
+                <thead style="background: #149916" border = '2px'>
                 <tr align="center" style="vertical-align: middle;">
                 <th width="5px"  rowspan="2" >ESPECI FICACION</th>
                 <th rowspan="2">No.</th>

@@ -1,10 +1,14 @@
 @extends('layouts.app')
 
+@section('body_options')
+background='{{asset("img/archivos2.jpg")}}' style='background-size: cover;'
+@endsection
+
 @section('content')
 
 <div class='row justify-content-center' id="app">
 <div class="col-sm-6">
-        <div class="card card-success" style="background: rgb(255, 255, 255,0.3)">
+        <div class="card card-success" style="background: rgb(255, 255, 255,0.5)">
               <div class="card-header">
                 <h3 class="card-title">Nueva Compra</h3>
               </div>
@@ -65,7 +69,16 @@
 <button id="btnMostrarRegistro" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalProveedor">
   Registrar Proveedor
 </button>
-
+<br>
+<div class="form-group">
+<div class="col">
+  @error('prov')
+  <div class="alert alert-danger" role="alert">
+    <strong>{{ $message }}</strong>
+  </div>
+  @enderror
+</div>
+</div>
 <!-- Modal nuevo Proveedor-->
 <div class="modal fade" id="modalProveedor" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">

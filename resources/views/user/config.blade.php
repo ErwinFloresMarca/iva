@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('body_options')
+background='{{asset("img/archivos2.jpg")}}' style='background-size: cover;'
+@endsection
+
 @section('scripts')
 <script>
 const app=new Vue({

@@ -88,6 +88,7 @@
                     <td {!!UtilsVentas::getStyle($tamColum[$ip++])!!}>{{UtilsVentas::formatDate($venta->fecha)}}</td>
                     <td {!!UtilsVentas::getStyle($tamColum[$ip++])!!}>{{$venta->nro_factura}}</td>
                     <td {!!UtilsVentas::getStyle($tamColum[$ip++])!!}>
+                        {{App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,$mes->gestion->id)->nro_autorizacion}}
                         <!-- numero de autorizacion Datos Administrativos -->
                     </td>
                     <td {!!UtilsVentas::getStyle($tamColum[$ip++])!!}>{{($venta->estado)?"V":"A"}}</td>

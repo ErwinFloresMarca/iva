@@ -1,7 +1,8 @@
 <center>
             <?php 
                 use App\Utils;
-                $tamColum=Utils::getTamColumCarta();
+                $tamColum=Utils::getTamColumExcel();
+
                 $ip=0;
             ?>
                 
@@ -87,7 +88,7 @@
                 ?>
                 @endforeach
                 <tr align="center" style="background: #FFFFFF;border: back 1px solid">
-                    <td {!!Utils::getStyle(Utils::sumPx(array($ip++,$ip++)))!!} colspan="2">TOTAL</td>
+                    <td {!!Utils::getStyle(Utils::sum(array($ip++,$ip++)))!!} colspan="2">TOTAL</td>
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}></td>
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}></td>
                     <td {!!Utils::getStyle($tamColum[$ip++])!!}></td>

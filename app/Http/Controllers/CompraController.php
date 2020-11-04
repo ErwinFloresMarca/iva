@@ -62,6 +62,7 @@ class CompraController extends Controller
     {
         $campos=array();
         $mensages=[
+            'prov.required'=>'Debe seleccionar o registrar un Proveedor.',
             'proveedor_id.required'=>'debe seleccionar un Proveedor',
             'NIT.required' => 'El NIT es requerido.',
             'NIT.unique' =>'El NIT ya se encuentra registrado.',
@@ -74,6 +75,10 @@ class CompraController extends Controller
             'nro_factura.unique'=>'Este numero de factura ya existe',
             'importe.required'=>'El campo Importe es Requerido.'
         ];
+        if($request->prooveedorSeleccionado=='false'&&$request->nuevoProveedor=='false'){
+            $campos['prov']='required';
+        }
+
         if($request->prooveedorSeleccionado=='true'){
             $campos['proveedor_id']='required';
         }
@@ -209,14 +214,6 @@ class CompraController extends Controller
         $pdf = App::make('dompdf.wrapper');
         $pdf->setPaper('letter', 'landscape');
         $pdf->loadView('compra.libro_carta',[
-            'mes'=>$mes
-        ]);
-        return $pdf->stream();
-    }
-    public function generarPDFoficio(Mes $mes){
-        $pdf = App::make('dompdf.wrapper');
-        $pdf->setPaper('folio', 'landscape');
-        $pdf->loadView('compra.libro_oficio',[
             'mes'=>$mes
         ]);
         return $pdf->stream();

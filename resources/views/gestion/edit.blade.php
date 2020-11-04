@@ -1,9 +1,13 @@
 @extends('layouts.app')
+@section('body_options')
+background='{{asset("img/archivos4.jpg")}}' style='background-size: cover;'
+@endsection
+
 
 @section('content')
 <div class='row justify-content-center'>
-<div class="col-sm-6">
-        <div class="card card-warning">
+<div class="col-sm-6" >
+        <div class="card card-warning" style="background: rgb(255, 255, 255,0.5)">
               <div class="card-header">
                 <h3 class="">Editar Gestion</h3>
               </div>

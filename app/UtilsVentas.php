@@ -10,7 +10,17 @@ class UtilsVentas extends Model
         //       espe    no.  fecha  no_fac  Auth   estado  nit    nom    impT  TASAS   Exen   cero  subT   Desc    base   deb    cod
         return ["25px","20px","45px","35px","60px","35px","60px","140px","45px","40px","45px","45px","50px","40px","60px","45px","40px"];
     }
+    public static function getTamColumExcel(){
+        //       espe    no.  fecha  no_fac  Auth   estado  nit    nom    impT  TASAS   Exen   cero  subT   Desc    base   deb    cod
+        return ["8","5","11","12","15","9","12","28","9","8","9","9","10","8","12","9","8"];
+    }
     public static function sumPx($arr){
+        $sum=0;
+        foreach($arr as $pos)
+            $sum+=UtilsVentas::getTamColumExcel()[$pos];
+        return $sum;
+    }
+    public static function sum($arr){
         $sum=0;
         foreach($arr as $pos)
             $sum+=str_replace("px","",UtilsVentas::getTamColumCarta()[$pos]);

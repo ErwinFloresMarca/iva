@@ -81,6 +81,9 @@ const app=new Vue({
         background-color: #409EFF;
         color: white;
     }
+    th {
+        border-color: black;
+    }
 </style>
 <div id="app">
     <el-dialog :visible.sync="showFormProveedor">
@@ -152,9 +155,9 @@ const app=new Vue({
            @endphp
     
             <br>
-            <table width="100%" border=2>
-                <thead style="background: #C8A2C8">
-                <tr align="center" style="vertical-align: middle;">
+            <table width="100%" border='2px'>
+                <thead style="background: #149916">
+                <tr align="center" style="vertical-align: middle;" border ='2px' >
                 <th width="5px"  rowspan="2" >ESPECI FICACION</th>
                 <th rowspan="2">No.</th>
                 <th rowspan="2">FECHA</th>

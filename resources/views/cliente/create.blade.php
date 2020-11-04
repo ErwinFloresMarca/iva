@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('body_options')
-background='{{asset("img/clientes.jpg")}}' style='background-size: cover;'
+background='{{asset("img/agricultor1.jpg")}}' style='background-size: cover;'
 @endsection
 
 @section('content')

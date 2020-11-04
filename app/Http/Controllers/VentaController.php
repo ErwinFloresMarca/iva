@@ -201,59 +201,9 @@ class VentaController extends Controller
         ]);
         return $pdf->stream();
     }
-    public function generarPDFoficio(Mes $mes){
-        $pdf = App::make('dompdf.wrapper');
-        $pdf->setPaper('folio', 'landscape');
-        $pdf->loadView('venta.libro_oficio',[
-            'mes'=>$mes
-        ]);
-        return $pdf->stream();
-    }
 
     public function generarExcel(Mes $mes)
     {   
-        /*
-        $pdf = App::make('dompdf.wrapper');
-        $pdf->setPaper('letter', 'landscape');
-        $pdf->loadView('compra.libro_carta',[
-            'mes'=>$mes
-        ]);
-        //$pdf->render();
-        $output = $pdf->output();
-        
-        $pdf_file = 'test.pdf';
-        
-        if (!is_readable($pdf_file)) {
-                print("Error: file does not exist or is not readable: $pdf_file\n");
-                return;
-        }
-        
-        $c = curl_init();
-
-        $cfile = $output;//curl_file_create($output, 'application/pdf');
-
-        $apikey = 'lwfjdyujobqh'; // from https://pdftables.com/api
-        curl_setopt($c, CURLOPT_URL, "https://pdftables.com/api?key=$apikey&format=xlsx-single");
-        curl_setopt($c, CURLOPT_POSTFIELDS, array('file' => $cfile));
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($c, CURLOPT_FAILONERROR,true);
-        curl_setopt($c, CURLOPT_ENCODING, "gzip,deflate");
-
-        $result = curl_exec($c);
-
-        if (curl_errno($c) > 0) {
-            print('Error calling PDFTables: '.curl_error($c).PHP_EOL);
-        } else {
-            // save the CSV we got from PDFTables to a file
-            file_put_contents ("ejemplo_excel.xlsx", $result);
-        }
-
-        curl_close($c);
-        
-
-        return response()->download("./ejemplo_excel.xlsx");
-        //return Response::download($result, 'filename.xlsx', $headers);
-        //return $result;*/
-        return Excel::download(new VentasExportView($mes->id),'LIBRO_Ventas_IVA_'.$mes->mes.'_'.$mes->gestion->gestion.'_POTOSI.xlsx');
+        return Excel::download(new VentasExportView($mes->id),'LIBRO_VENTAS_IVA_'.$mes->mes.'_'.$mes->gestion->gestion.'_POTOSI.xlsx');
     }
 }

@@ -2,16 +2,18 @@
 
 namespace App\Exports;
 
-use App\Venta;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use App\Mes;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
 
-class VentasExportView implements FromCollection
+class VentasExportView implements FromView
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public $mes_id=0;
+    public function __construct($m_id){
+        $this->mes_id=$m_id;
+    }
+    public function view():View
     {
-        return Venta::all();
+        return view('venta.libro_carta_excel')->with('mes',Mes::find($this->mes_id));
     }
 }

@@ -5,7 +5,6 @@ namespace App\Exports;
 use App\Mes;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class ComprasExportView implements FromView
 {
     public $mes_id=0;
