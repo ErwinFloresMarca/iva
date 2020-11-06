@@ -12,19 +12,16 @@ const app=new Vue({
         return {
             imageUrl: '',
             tabAuthData:[],
-            proveedor: {!! (Auth::user()->proveedor)? Auth::user()->proveedor : 'null' !!},
+            proveedor: {!! (Auth::user()->proveedor)? Auth::user()->proveedor : '{}' !!},
             editProveedor: false,
             provErrors: {},
             avatar:{!! Auth::user()->avatar? '"'.Illuminate\Support\Facades\Storage::url(Auth::user()->avatar->url).'"': 'null' !!},
             user: {!! Auth::user() !!},
             editUser: false,
             userErrors: {},
-            nuevoProv: {},
-            autorizaciones: {!! (Auth::user()->proveedor)? Auth::user()->proveedor->autorizaciones : 'null' !!},
-            showFormProveedor: false,
+            autorizaciones: {!! (Auth::user()->proveedor)? Auth::user()->proveedor->autorizaciones : '[]' !!},
             error: {},
             gestiones: {!! json_encode(App\Gestion::all()) !!},
-            showForm: false,
             nuevaAutorizacion: {},
             numeroDeAuthorizacion: {!! (Auth::user()->proveedor)? ( App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,App\Gestion::ultimaGestion()->id)? App\Autorizacion::obtenerNroAutorizacion(Auth::user()->proveedor->id,App\Gestion::ultimaGestion()->id): 'null' ) : 'null' !!},
         };
@@ -36,6 +33,10 @@ const app=new Vue({
         }
     },
     methods: {
+        createProveedor(){
+            this.proveedor.id = -1;
+            this.editProveedor = true;
+        },
         handleAvatarSuccess(res, file) {
             this.$message({
                 message:'imagen subida exitosamente',
@@ -52,7 +53,6 @@ const app=new Vue({
             }
             return isLt2M;
         },
-        
         saveUser(){
             const app=this;
             axios.put('/api/user/'+this.user.id,this.user).then((data)=>{
@@ -157,31 +157,59 @@ const app=new Vue({
             return data;
         },
         saveProveedor(){
-            this.nuevoProv.userId = this.user.id,
-            axios.put('/api/proveedor/'+this.proveedor.id,this.proveedor).then((data)=>{
-                this.proveedor = data.data.proveedor;
-                this.$message({
-                    message: "Informacion Registrada",
-                    type: 'success',
-                    showClose: true,
+            if(this.proveedor.id>0){
+                axios.put('/api/proveedor/'+this.proveedor.id,this.proveedor).then((data)=>{
+                    this.proveedor = data.data.proveedor;
+                    this.$message({
+                        message: "Informacion Registrada",
+                        type: 'success',
+                        showClose: true,
+                    });
+                    this.provErrors = {};
+                    this.editProveedor = false ;
+                }).catch((error)=>{
+                    this.provErrors = {};
+                    if(error.request){
+                        let errors = JSON.parse(error.request.response).errors;
+                        this.provErrors = errors;
+                        if(this.provErrors==null)
+                            this.provErrors = {};
+                    }
+                    
+                    this.$message({
+                        message: error.toString(),
+                        type: "error",
+                        showClose: true
+                    });
                 });
-                this.provErrors = {};
-                this.editProveedor = false ;
-            }).catch((error)=>{
-                this.provErrors = {};
-                if(error.request){
-                    let errors = JSON.parse(error.request.response).errors;
-                    this.provErrors = errors;
-                    if(this.provErrors==null)
-                        this.provErrors = {};
-                }
-                 
-                this.$message({
-                    message: error.toString(),
-                    type: "error",
-                    showClose: true
+            } else {
+                this.proveedor.userId = this.user.id;
+                axios.post('/api/proveedor/',this.proveedor).then((data)=>{
+                    this.proveedor = data.data.proveedor;
+                    this.$message({
+                        message: "Informacion Registrada",
+                        type: 'success',
+                        showClose: true,
+                    });
+                    this.provErrors = {};
+                    this.editProveedor = false ;
+                }).catch((error)=>{
+                    this.provErrors = {};
+                    if(error.request){
+                        let errors = JSON.parse(error.request.response).errors;
+                        this.provErrors = errors;
+                        if(this.provErrors==null)
+                            this.provErrors = {};
+                    }
+                    
+                    this.$message({
+                        message: error.toString(),
+                        type: "error",
+                        showClose: true
+                    });
                 });
-            });
+            }
+            
         },
     },
 });
@@ -253,58 +281,67 @@ const app=new Vue({
         
         </el-col>
         <el-col :span="12" :offset="0">
-        <h1 style="font-family: 'Franklin Gothic Medium'">INSTITUCION <el-button v-if="!editProveedor" type="warning" size="small" @click="editProveedor=true" icon="el-icon-edit" circle></el-button>
+        <h1 style="font-family: 'Franklin Gothic Medium'">INSTITUCION <el-button v-if="!editProveedor&&proveedor.id" type="warning" size="small" @click="editProveedor=true" icon="el-icon-edit" circle></el-button>
         </h1>
         <br>
-        <el-form :model="proveedor" ref="formProveedor" label-width="100px" :inline="false" size="normal">
-            <el-form-item label="NIT" :error="provErrors.NIT? provErrors.NIT[0]: null">
-                <el-input v-model="proveedor.NIT" :readonly="!editProveedor"></el-input>
-            </el-form-item>
-            <el-form-item label="Razón social" :error="provErrors.razon_social? provErrors.razon_social[0]: null">
-                <el-input v-model="proveedor.razon_social" :readonly="!editProveedor"></el-input>
-            </el-form-item>
-            <el-form-item v-if='editProveedor'>
-                <el-button type="primary" @click="saveProveedor">Guardar</el-button>
-                <el-button  @click="editProveedor=!editProveedor" type="danger">Cancelar</el-button>
-            </el-form-item>
-        </el-form>
-        <h3 style="font-family: 'Franklin Gothic Medium'">Numeros de Autorizacion</h3>
-        <el-table :data="getDataAuths()" border stripe max-height='170px'>
-            <el-table-column 
-                :prop="'gestion'"
-                :key="'gestion'"
-                label="Gestion">
-            </el-table-column>
-            <el-table-column 
-                label="Nro. Autorizacion">
-                <template slot-scope="scope">
-                    <template v-if="tabAuthData[scope.$index].edit">
-                        <el-input type='number' v-model="tabAuthData[scope.$index].nro_autorizacion" placeholder="Nro. Autorizacion" size="normal" ></el-input>
-                    </template>
-                    <template v-else>
-                        @{{tabAuthData[scope.$index].nro_autorizacion}}
-                    </template>
-                </template>
-            </el-table-column>
-            <el-table-column
-                label="Opciones">
-                <template slot-scope="scope">
-                    <template v-if="tabAuthData[scope.$index].edit">
-                        <el-button type="default" size="small" @click="saveAuth(scope.$index)" icon="el-icon-s-claim" circle></el-button>
-                    </template>
-                    <template v-else>
-                        <template v-if='tabAuthData[scope.$index].nro_autorizacion'>
-                            <el-button type="warning" size="small" @click="tabAuthData[scope.$index].edit=true" icon="el-icon-edit" circle></el-button>
-                            <el-button type="danger" size="small" @click="eliminarAuth(scope.$index)" icon="el-icon-delete" circle></el-button>
+        <template v-if="proveedor.id">
+
+            <el-form :model="proveedor" ref="formProveedor" label-width="100px" :inline="false" size="normal">
+                <el-form-item label="NIT" :error="provErrors.NIT? provErrors.NIT[0]: null">
+                    <el-input v-model="proveedor.NIT" :readonly="!editProveedor"></el-input>
+                </el-form-item>
+                <el-form-item label="Razón social" :error="provErrors.razon_social? provErrors.razon_social[0]: null">
+                    <el-input v-model="proveedor.razon_social" :readonly="!editProveedor"></el-input>
+                </el-form-item>
+                <el-form-item v-if='editProveedor'>
+                    <el-button type="primary" @click="saveProveedor">Guardar</el-button>
+                    <el-button  @click="editProveedor=!editProveedor" type="danger">Cancelar</el-button>
+                </el-form-item>
+            </el-form>
+
+            <template v-if="proveedor.id>0">
+                <h3 style="font-family: 'Franklin Gothic Medium'">Numeros de Autorizacion</h3>
+                <el-table :data="getDataAuths()" border stripe max-height='170px'>
+                    <el-table-column 
+                        :prop="'gestion'"
+                        :key="'gestion'"
+                        label="Gestion">
+                    </el-table-column>
+                    <el-table-column 
+                        label="Nro. Autorizacion">
+                        <template slot-scope="scope">
+                            <template v-if="tabAuthData[scope.$index].edit">
+                                <el-input type='number' v-model="tabAuthData[scope.$index].nro_autorizacion" placeholder="Nro. Autorizacion" size="normal" ></el-input>
+                            </template>
+                            <template v-else>
+                                @{{tabAuthData[scope.$index].nro_autorizacion}}
+                            </template>
                         </template>
-                        <template v-else>
-                            <el-button type="success" size="small" @click="tabAuthData[scope.$index].edit=true" icon="el-icon-plus" circle></el-button>
+                    </el-table-column>
+                    <el-table-column
+                        label="Opciones">
+                        <template slot-scope="scope">
+                            <template v-if="tabAuthData[scope.$index].edit">
+                                <el-button type="default" size="small" @click="saveAuth(scope.$index)" icon="el-icon-s-claim" circle></el-button>
+                            </template>
+                            <template v-else>
+                                <template v-if='tabAuthData[scope.$index].nro_autorizacion'>
+                                    <el-button type="warning" size="small" @click="tabAuthData[scope.$index].edit=true" icon="el-icon-edit" circle></el-button>
+                                    <el-button type="danger" size="small" @click="eliminarAuth(scope.$index)" icon="el-icon-delete" circle></el-button>
+                                </template>
+                                <template v-else>
+                                    <el-button type="success" size="small" @click="tabAuthData[scope.$index].edit=true" icon="el-icon-plus" circle></el-button>
+                                </template>
+                            </template>
                         </template>
-                    </template>
-                </template>
-            </el-table-column>
-        </el-table>
-        
+                    </el-table-column>
+                </el-table>
+
+            </template>        
+        </template>
+        <template v-else>
+            <el-button type="success" size="default" @click="createProveedor">Registrar Datos De la Institucion</el-button>    
+        </template>
         </el-col>
         
     </el-row>

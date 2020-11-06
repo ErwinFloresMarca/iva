@@ -82,7 +82,9 @@ class ProveedorController extends Controller
             $user->proveedor_id = $nuevo->id;
             $user->save();
         }
-        if( strpos($accept,'application/json'))
+        
+        $res = strpos($accept,'application/json');
+        if( $res == 0)
         {
             $res = ['msn'=>'registro exitoso','proveedor'=>$nuevo];
             if($request->nro_autorizacion){
